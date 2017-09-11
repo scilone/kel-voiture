@@ -36,10 +36,10 @@ class Db
                 );
             } else {
                 $mysqli = new mysqli(
-                    "nicolasnobre.com.mysql",
-                    "nicolasnobre_co",
-                    "Pj8XTqg6",
-                    "nicolasnobre_co"
+                     "localhost",
+                    "root",
+                    "nicolasnobre",
+                    "kelVoiture"
                 );
             }
 
