@@ -158,7 +158,7 @@ if (!empty($_POST)) {
                                     <?= createCheckbox('40', 'Citadine&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
                                     <?= createCheckbox('45', 'Coupé&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
                                     <?= createCheckbox('46', 'Cabriolet&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
-                                    <?= createCheckbox('41,42', 'Berline&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
+                                    <?= createCheckbox('41_42', 'Berline&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
                                     <?= createCheckbox('43', 'Break&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
                                     <?= createCheckbox('44', 'Monospace&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
                                     <?= createCheckbox('47', '4x4/SUV/Crossover&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
@@ -542,7 +542,7 @@ if (!empty($_POST)) {
                                                 <?php
                                                 foreach ($aInfo as $sModel => $sNumber) {
                                                     $uriParams = $aParams;
-                                                    $uriParams['makesModelsCommercialNames'] .= ":$sModel";
+                                                    $uriParams['makesModelsCommercialNames'] = "$sBrand:$sModel";
                                                     $sModel = explode(':', $sModel)[1];
                                                     ?>
                                                     <li class="list-group-item">

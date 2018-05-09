@@ -14,7 +14,7 @@ function arrayToUrl($array)
 {
     $return = null;
     foreach ($array as $key => $value) {
-        $return .= htmlentities("$key=$value&");
+        $return .= "$key=$value&";
     }
 
     return $return;
@@ -374,7 +374,7 @@ function initCarsGet(Mycurl $oMycurl, array $aParams, int $levelDetail) :array
     //Get number of the last page
     preg_match('#\<span class\=\"numAnn\"\>(.*)\<\/span\>#U', $oMycurl->getWebPage(), $aMatches);
 
-    $aList['numberPage'] = (int) trim($aMatches[1]) / 16;
+    $aList['numberPage'] = ceil(str_replace('%C2%A0', '', urlencode($aMatches[1])) / 16);
 
     return $aList;
 }
