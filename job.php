@@ -14,7 +14,7 @@ function arrayToUrl($array)
 {
     $return = null;
     foreach ($array as $key => $value) {
-        $return .= $key . '=' . $value . '&';
+        $return .= htmlentities("$key=$value&");
     }
 
     return $return;
@@ -33,13 +33,13 @@ function getCarInfos(Mycurl $oMycurl, $aList, $levelDetail)
     if ($levelDetail === 1) {
         $repository = new Repository();
     }
-
+    //print_r(htmlentities($oMycurl->getWebPage()));exit;
     // get results HTML
-    preg_match(
-        '#(<div\s*class="\s*resultList.*<!-- end file tb_item_listing.php -->)#s',
+    /*preg_match(
+        '#(<div\s*class="\s*resultList.*<div\s*class="\s*resultListLoader)#s',
         $oMycurl->getWebPage(),
         $matches
-    );	
+    );
 
     libxml_use_internal_errors(true);
     $dom_ban = new domDocument;
@@ -113,6 +113,62 @@ function getCarInfos(Mycurl $oMycurl, $aList, $levelDetail)
             $repository->insertHistory($aList[$idAnnonce]);
         }
     }
+    */
+
+    preg_match(
+        '#window.__PRELOADED_STATE__ \= ({.*})\<\/script\>#s',
+        $oMycurl->getWebPage(),
+        $matches
+    );
+
+    $hits = json_decode($matches[1])->search->hits;
+
+    foreach ($hits as $hit) {
+        $item = $hit->item;
+        $vehicle = $item->vehicle;
+
+        $marque         = $vehicle->make;
+        $modele         = $vehicle->model . ':' . $vehicle->commercialName;
+        $version        = $vehicle->version;
+
+        if ($levelDetail == 2) {
+            if (!isset($aList[$marque][$modele])) {
+                $aList[$marque][$modele] = 0;
+            }
+
+            $aList[$marque][$modele] ++;
+        } elseif ($levelDetail == 3) {
+            if (!isset($aList[$marque])) {
+                $aList[$marque] = 0;
+            }
+
+            $aList[$marque] ++;
+        } elseif ($levelDetail == 4) {
+            if (!isset($aList[$marque][$modele][$version])) {
+                $aList[$marque][$modele][$version] = 0;
+            }
+
+            $aList[$marque][$modele][$version] ++;
+        } else {
+            $idAnnonce = $item->reference;
+
+            $aList[$idAnnonce]['idAnnonce'] = $idAnnonce;
+            $aList[$idAnnonce]['idSearch']  = 0;
+
+            $aList[$idAnnonce]['brand']   = $marque;
+            $aList[$idAnnonce]['model']   = $modele;
+            $aList[$idAnnonce]['version'] = $version;
+
+            $aList[$idAnnonce]['seller'] = $item->customerType;
+            $aList[$idAnnonce]['dept']   = $item->location->visitPlace;
+            $aList[$idAnnonce]['year']   = $vehicle->year;
+
+            $aList[$idAnnonce]['km'] = $vehicle->mileage;
+            $aList[$idAnnonce]['price'] = $item->price;
+
+            $repository->insertHistory($aList[$idAnnonce]);
+        }
+    }
 
     return $aList;
 }
@@ -134,50 +190,50 @@ function paramsFormatter($aParams)
     /**
      * Categories
      */
-    if (isset($aNewParams['SS_CATEGORIE'])) {
-        $aNewParams['SS_CATEGORIE'] = implode(',', $aNewParams['SS_CATEGORIE']);
+    if (isset($aNewParams['categories'])) {
+        $aNewParams['categories'] = implode(',', $aNewParams['categories']);
     }
 
     /**
      * pdin
-     */
-    if (isset($aNewParams['pdin1'])) {
-        $aNewParams['pdin'] = $aNewParams['pdin1'];
-        unset($aNewParams['pdin1']);
+
+    if (isset($aNewParams['powerDINMin'])) {
+        $aNewParams['pdin'] = $aNewParams['powerDINMin'];
+        unset($aNewParams['powerDINMin']);
     } else {
         $aNewParams['pdin'] = 0;
     }
 
-    if (isset($aNewParams['pdin2'])) {
-        $aNewParams['pdin'] .= '|' . $aNewParams['pdin2'];
-        unset($aNewParams['pdin2']);
+    if (isset($aNewParams['powerDINMax'])) {
+        $aNewParams['pdin'] .= '|' . $aNewParams['powerDINMax'];
+        unset($aNewParams['powerDINMax']);
     } else {
         $aNewParams['pdin'] .= '|-1';
     }
 
     if ($aNewParams['pdin'] === '0|-1') {
         unset($aNewParams['pdin']);
-    }
+    }*/
 
     /**
      * pfisc
-     */
-    if (isset($aNewParams['pfisc1'])) {
-        $aNewParams['pfisc'] = $aNewParams['pfisc1'];
-        unset($aNewParams['pfisc1']);
+
+    if (isset($aNewParams['ratedHorsePowerMin'])) {
+        $aNewParams['pfisc'] = $aNewParams['ratedHorsePowerMin'];
+        unset($aNewParams['ratedHorsePowerMin']);
     } else {
         $aNewParams['pfisc'] = 0;
     }
 
-    if (isset($aNewParams['pfisc2']) && isset($aNewParams['pfisc2']) < $aNewParams['pfisc']) {
-        unset($aNewParams['pfisc2']);
+    if (isset($aNewParams['ratedHorsePowerMax']) && isset($aNewParams['ratedHorsePowerMax']) < $aNewParams['pfisc']) {
+        unset($aNewParams['ratedHorsePowerMax']);
     }
 
-    if (isset($aNewParams['pfisc2'])) {
-        for ($i = $aNewParams['pfisc'] + 1; $i <= $aNewParams['pfisc2']; $i ++) {
+    if (isset($aNewParams['ratedHorsePowerMax'])) {
+        for ($i = $aNewParams['pfisc'] + 1; $i <= $aNewParams['ratedHorsePowerMax']; $i ++) {
             $aNewParams['pfisc'] .= ',' . $i;
         }
-        unset($aNewParams['pfisc2']);
+        unset($aNewParams['ratedHorsePowerMax']);
     } else {
         for ($i = $aNewParams['pfisc'] + 1; $i <= 50; $i ++) {
             $aNewParams['pfisc'] .= ',' . $i;
@@ -186,19 +242,19 @@ function paramsFormatter($aParams)
 
     if (substr($aNewParams['pfisc'], - 2) == 50 && substr($aNewParams['pfisc'], 0, 1) == 0) {
         unset($aNewParams['pfisc']);
-    }
+    }*/
 
-    if (isset($aNewParams['prix_mini'])) {
-        $aNewParams['prix_mini'] = str_replace(' ', '', $aNewParams['prix_mini']);
+    if (isset($aNewParams['priceMin'])) {
+        $aNewParams['priceMin'] = str_replace(' ', '', $aNewParams['priceMin']);
     }
-    if (isset($aNewParams['prix_maxi'])) {
-        $aNewParams['prix_maxi'] = str_replace(' ', '', $aNewParams['prix_maxi']);
+    if (isset($aNewParams['priceMax'])) {
+        $aNewParams['priceMax'] = str_replace(' ', '', $aNewParams['priceMax']);
     }
-    if (isset($aNewParams['km_mini'])) {
-        $aNewParams['km_mini'] = str_replace(' ', '', $aNewParams['km_mini']);
+    if (isset($aNewParams['mileageMin'])) {
+        $aNewParams['mileageMin'] = str_replace(' ', '', $aNewParams['mileageMin']);
     }
-    if (isset($aNewParams['km_maxi'])) {
-        $aNewParams['km_maxi'] = str_replace(' ', '', $aNewParams['km_maxi']);
+    if (isset($aNewParams['mileageMax'])) {
+        $aNewParams['mileageMax'] = str_replace(' ', '', $aNewParams['mileageMax']);
     }
 
     return $aNewParams;
@@ -219,7 +275,7 @@ function getDomain()
  */
 function getUri($aParams)
 {
-    return 'listing_auto.php?' . arrayToUrl($aParams);
+    return 'listing?' . arrayToUrl($aParams);
 }
 
 /**
@@ -233,7 +289,7 @@ function getForLive($aParams)
 
     $levelDetail = 2;
 
-    $aParams['num'] = '1';
+    $aParams['page'] = '1';
 
     $aList = initCarsGet($oMycurl, $aParams, $levelDetail);
 
@@ -241,12 +297,12 @@ function getForLive($aParams)
 
     //boucle sur les autres pages si besoin
     if ($aList['numberPage'] > 1) {
-        $fileProgressBar->setValue(round($aParams['num'] * 100 / $aList['numberPage']));
+        $fileProgressBar->setValue(round($aParams['page'] * 100 / $aList['numberPage']));
 
         for ($i = 2; $i <= $aList['numberPage']; $i ++) {
-            $aParams['num'] = $i;
+            $aParams['page'] = $i;
 
-            $fileProgressBar->setValue(round($aParams['num'] * 100 / $aList['numberPage']));
+            $fileProgressBar->setValue(round($aParams['page'] * 100 / $aList['numberPage']));
 
             $aList = getCars($oMycurl, $aParams, $levelDetail, $aList);
         }
@@ -316,16 +372,9 @@ function initCarsGet(Mycurl $oMycurl, array $aParams, int $levelDetail) :array
     $aList = getCarInfos($oMycurl, [], $levelDetail);
 
     //Get number of the last page
-    preg_match_all('#<a.*href="\?.*num=([0-9]*)&.*".*>.*</a>#U', $oMycurl->getWebPage(), $aMatches);
+    preg_match('#\<span class\=\"numAnn\"\>(.*)\<\/span\>#U', $oMycurl->getWebPage(), $aMatches);
 
-    $iLastPage = null;
-    foreach ($aMatches[1] as $sNum) {
-        if ($sNum > $iLastPage) {
-            $iLastPage = $sNum;
-        }
-    }
-
-    $aList['numberPage'] = $iLastPage;
+    $aList['numberPage'] = (int) trim($aMatches[1]) / 16;
 
     return $aList;
 }

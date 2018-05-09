@@ -39,6 +39,26 @@ function createOption($value, $name, $defaultValue) {
 
     return "<option value=\"$value\" $selected>$name</option>";
 }
+
+
+if (!empty($_POST)) {
+    $aParams = paramsFormatter($_POST);
+    $aResult = getForLive($aParams);
+
+    $iNumberPages = $aResult['numberPage'];
+    unset($aResult['numberPage']);
+
+    if (is_array($aResult)) {
+        $iTotalResult = 0;
+        foreach ($aResult as $sBrand => $aCars) {
+            foreach ($aCars as $value) {
+                $iTotalResult++;
+            }
+            ksort($aResult[$sBrand]);
+        }
+        ksort($aResult);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -73,29 +93,6 @@ function createOption($value, $name, $defaultValue) {
     </head>
 
     <body>
-        <?php
-
-        if (!empty($_POST)) {
-            $aParams = paramsFormatter($_POST);
-            //var_dump(serialize($aParams));exit;
-            $aResult = getForLive($aParams);
-            
-            $iNumberPages = $aResult['numberPage'];
-            unset($aResult['numberPage']);
-
-            if (is_array($aResult)) {
-                $iTotalResult = 0;
-                foreach ($aResult as $sBrand => $aCars) {
-                    foreach ($aCars as $value) {
-                        $iTotalResult++;
-                    }
-                    ksort($aResult[$sBrand]);
-                }
-                ksort($aResult);
-            }
-        }
-        ?>
-
         <div id="overlay" style="display: none;height: 100%;width: 100%;background: grey;position: fixed;z-index: 999;opacity: 0.5;"></div>
         <div style="z-index: 1000;position: fixed;top: 30%;width: 100%;left: 0%;display:none;" id="overlay-wait">
             <div class="container">
@@ -156,21 +153,21 @@ function createOption($value, $name, $defaultValue) {
                             <div class="form-group">
                                 <label for="categorie">Categorie:</label><br/>
                                 <div class="checkbox" id="categorie">
-                                    <?php if (!isset($_POST['SS_CATEGORIE'])) $_POST['SS_CATEGORIE'] = null; ?>
-                                    <?= createCheckbox('48', 'Sans permis&nbsp;&nbsp;', 'SS_CATEGORIE[]', $_POST['SS_CATEGORIE']) ?>
-                                    <?= createCheckbox('40', 'Citadine&nbsp;&nbsp;', 'SS_CATEGORIE[]', $_POST['SS_CATEGORIE']) ?>
-                                    <?= createCheckbox('45', 'Coupé&nbsp;&nbsp;', 'SS_CATEGORIE[]', $_POST['SS_CATEGORIE']) ?>
-                                    <?= createCheckbox('46', 'Cabriolet&nbsp;&nbsp;', 'SS_CATEGORIE[]', $_POST['SS_CATEGORIE']) ?>
-                                    <?= createCheckbox('41,42', 'Berline&nbsp;&nbsp;', 'SS_CATEGORIE[]', $_POST['SS_CATEGORIE']) ?>
-                                    <?= createCheckbox('43', 'Break&nbsp;&nbsp;', 'SS_CATEGORIE[]', $_POST['SS_CATEGORIE']) ?>
-                                    <?= createCheckbox('44', 'Monospace&nbsp;&nbsp;', 'SS_CATEGORIE[]', $_POST['SS_CATEGORIE']) ?>
-                                    <?= createCheckbox('47', '4x4/SUV/Crossover&nbsp;&nbsp;', 'SS_CATEGORIE[]', $_POST['SS_CATEGORIE']) ?>
-                                    <?= createCheckbox('49', 'Collection&nbsp;&nbsp;', 'SS_CATEGORIE[]', $_POST['SS_CATEGORIE']) ?>
+                                    <?php if (!isset($_POST['categories'])) $_POST['categories'] = null; ?>
+                                    <?= createCheckbox('48', 'Sans permis&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
+                                    <?= createCheckbox('40', 'Citadine&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
+                                    <?= createCheckbox('45', 'Coupé&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
+                                    <?= createCheckbox('46', 'Cabriolet&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
+                                    <?= createCheckbox('41,42', 'Berline&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
+                                    <?= createCheckbox('43', 'Break&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
+                                    <?= createCheckbox('44', 'Monospace&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
+                                    <?= createCheckbox('47', '4x4/SUV/Crossover&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
+                                    <?= createCheckbox('49', 'Collection&nbsp;&nbsp;', 'categories[]', $_POST['categories']) ?>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <select id="marque" class="form-control input-sm" name="marque">
+                                <select id="marque" class="form-control input-sm" name="makesModelsCommercialNames">
                                     <option value="" selected>Marque</option>
                                     <?= createOption('ABARTH', 'ABARTH', $_POST['marque']) ?>
                                     <?= createOption('ALFA ROMEO', 'ALFA ROMEO', $_POST['marque']) ?>
@@ -235,32 +232,32 @@ function createOption($value, $name, $defaultValue) {
                             </div>
 
                             <div class="form-group">
-                                <select id="cp" name="cp" class="form-control input-sm">
+                                <select id="regions" name="regions" class="form-control input-sm">
                                     <option value="" selected>Region</option>
-                                    <?= createOption('01,03,07,15,26,38,42,43,63,69,73,74', 'Auvergne-Rhône-Alpes', $_POST['cp']) ?>
-                                    <?= createOption('21,25,39,58,70,71,89,90', 'Bourgogne-Franche-Comté', $_POST['cp']) ?>
-                                    <?= createOption('22,29,35,56', 'Bretagne', $_POST['cp']) ?>
-                                    <?= createOption('18,28,36,37,41,45', 'Centre-Val de Loire', $_POST['cp']) ?>
-                                    <?= createOption('08,10,51,52,54,55,57,67,68,88', 'Grand Est', $_POST['cp']) ?>
-                                    <?= createOption('02,59,60,62,80', 'Hauts-de-France', $_POST['cp']) ?>
-                                    <?= createOption('75,77,78,91,92,93,94,95', 'Île-de-France', $_POST['cp']) ?>
-                                    <?= createOption('14,27,50,61,76', 'Normandie', $_POST['cp']) ?>
-                                    <?= createOption('16,17,19,23,24,33,40,47,64,79,86,87', 'Nouvelle-Aquitaine', $_POST['cp']) ?>
-                                    <?= createOption('09,11,12,30,31,32,34,46,48,65,66,81,82', 'Occitanie', $_POST['cp']) ?>
-                                    <?= createOption('44,49,53,72,85', 'Pays de la Loire', $_POST['cp']) ?>
-                                    <?= createOption('04,05,06,13,83,84', 'Provence-Alpes-Côte d\'Azur', $_POST['cp']) ?>
+                                    <?= createOption('FR-ARA', 'Auvergne-Rhône-Alpes', $_POST['regions']) ?>
+                                    <?= createOption('FR-BFC', 'Bourgogne-Franche-Comté', $_POST['regions']) ?>
+                                    <?= createOption('FR-BRE', 'Bretagne', $_POST['regions']) ?>
+                                    <?= createOption('FR-CVL', 'Centre-Val de Loire', $_POST['regions']) ?>
+                                    <?= createOption('FR-GES', 'Grand Est', $_POST['regions']) ?>
+                                    <?= createOption('FR-HDF', 'Hauts-de-France', $_POST['regions']) ?>
+                                    <?= createOption('FR-IDF', 'Île-de-France', $_POST['regions']) ?>
+                                    <?= createOption('FR-NOR', 'Normandie', $_POST['regions']) ?>
+                                    <?= createOption('FR-NAQ', 'Nouvelle-Aquitaine', $_POST['regions']) ?>
+                                    <?= createOption('FR-OCC', 'Occitanie', $_POST['regions']) ?>
+                                    <?= createOption('FR-PDL', 'Pays de la Loire', $_POST['regions']) ?>
+                                    <?= createOption('FR-PAC', 'Provence-Alpes-Côte d\'Azur', $_POST['regions']) ?>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <select class="form-control input-sm" id="carburant" name="energie">
                                     <option value="" selected>Carburant</option>
-                                    <?= createOption('2', 'Diesel', $_POST['energie']) ?>
-                                    <?= createOption('1', 'Essence', $_POST['energie']) ?>
-                                    <?= createOption('4', 'Electrique', $_POST['energie']) ?>
-                                    <?= createOption('8,9', 'Hybrides', $_POST['energie']) ?>
-                                    <?= createOption('3', 'Bicarburation essence / gpl', $_POST['energie']) ?>
-                                    <?= createOption('10', 'Bicarburation essence bioéthanol', $_POST['energie']) ?>
-                                    <?= createOption('5,6,7,11', 'Autres énergies alternatives', $_POST['energie']) ?>
+                                    <?= createOption('dies', 'Diesel', $_POST['energie']) ?>
+                                    <?= createOption('ess', 'Essence', $_POST['energie']) ?>
+                                    <?= createOption('elec', 'Electrique', $_POST['energie']) ?>
+                                    <?= createOption('hyb', 'Hybrides', $_POST['energie']) ?>
+                                    <?= createOption('gpl', 'Bicarburation essence / gpl', $_POST['energie']) ?>
+                                    <?= createOption('eth', 'Bicarburation essence bioéthanol', $_POST['energie']) ?>
+                                    <?= createOption('alt', 'Autres énergies alternatives', $_POST['energie']) ?>
                                 </select>
                             </div>
 
@@ -268,11 +265,11 @@ function createOption($value, $name, $defaultValue) {
                                 <div class="col-lg-6 padding-none-sm padding-0-10-0-0">
                                     <div class="input-group">
                                         <input placeholder="Prix minimum"
-                                               type="number" id="prix_mini"
-                                               name="prix_mini" min="0"
+                                               type="number" id="priceMin"
+                                               name="priceMin" min="0"
                                                step="100"
                                                class="form-control input-sm"
-                                               value="<?= $_POST['prix_mini'] ?>">
+                                               value="<?= $_POST['priceMin'] ?>">
                                         <span class="input-group-addon">€</span>
                                     </div>
                                 </div>
@@ -280,11 +277,11 @@ function createOption($value, $name, $defaultValue) {
                                     <div class="input-group">
                                         <input placeholder="Prix maximum"
                                                type="number"
-                                               id="prix_maxi"
-                                               name="prix_maxi"
+                                               id="priceMax"
+                                               name="priceMax"
                                                min="0" step="100"
                                                class="form-control input-sm"
-                                               value="<?= $_POST['prix_maxi'] ?>">
+                                               value="<?= $_POST['priceMax'] ?>">
                                         <span class="input-group-addon">€</span>
                                     </div>
                                 </div>
@@ -295,12 +292,12 @@ function createOption($value, $name, $defaultValue) {
                                     <div class="input-group">
                                         <input placeholder="Km minimum"
                                                type="number"
-                                               id="km_mini"
-                                               name="km_mini"
+                                               id="mileageMin"
+                                               name="mileageMin"
                                                step="1000"
                                                min="0"
                                                class="form-control input-sm"
-                                               value="<?= $_POST['km_mini'] ?>">
+                                               value="<?= $_POST['mileageMin'] ?>">
                                         <span class="input-group-addon">Km</span>
                                     </div>
                                 </div>
@@ -308,12 +305,12 @@ function createOption($value, $name, $defaultValue) {
                                     <div class="input-group">
                                         <input placeholder="Km maximum"
                                                type="number"
-                                               name="km_maxi"
-                                               id="km_maxi"
+                                               name="mileageMax"
+                                               id="mileageMax"
                                                step="1000"
                                                min="0"
                                                class="form-control input-sm"
-                                               value="<?= $_POST['km_maxi'] ?>">
+                                               value="<?= $_POST['mileageMax'] ?>">
                                         <span class="input-group-addon">Km</span>
                                     </div>
                                 </div>
@@ -321,12 +318,12 @@ function createOption($value, $name, $defaultValue) {
 
                             <div class="form-group padding-none col-md-12">
                                 <div class="col-lg-6 padding-none-sm  padding-0-10-0-0">
-                                    <select id="annee" name="annee" class="form-control input-sm">
+                                    <select id="yearMin" name="yearMin" class="form-control input-sm">
                                         <option value="" selected>Année minimum</option>
                                         <?php
                                         for ($i = 0; $i < 21; $i++) {
                                             $selected = '';
-                                            if ((date('Y') - $i) == $_POST['annee'])
+                                            if ((date('Y') - $i) == $_POST['yearMin'])
                                                 $selected = 'selected';
                                             echo '<option value="' . (date('Y') - $i) . '" ' . $selected . '>' . (date('Y') - $i) . '</option>';
                                         }
@@ -334,12 +331,12 @@ function createOption($value, $name, $defaultValue) {
                                     </select>
                                 </div>
                                 <div class="col-lg-6 padding-none-sm  padding-0-0-0-10">
-                                    <select id="annee2" name="annee2" class="form-control input-sm">
+                                    <select id="yearMax" name="yearMax" class="form-control input-sm">
                                         <option value="" selected>Année maximum</option>
                                         <?php
                                         for ($i = 0; $i < 21; $i++) {
                                             $selected = '';
-                                            if ((date('Y') - $i) == $_POST['annee2'])
+                                            if ((date('Y') - $i) == $_POST['yearMax'])
                                                 $selected = 'selected';
                                             echo '<option value="' . (date('Y') - $i) . '" ' . $selected . '>' . (date('Y') - $i) . '</option>';
                                         }
@@ -350,141 +347,141 @@ function createOption($value, $name, $defaultValue) {
 
                             <div class="form-group padding-none col-md-12">
                                 <div class="col-lg-4 padding-none-sm  padding-0-10-0-0">
-                                    <select id="conso" name="conso" class="form-control input-sm">
+                                    <select id="consumptionMax" name="consumptionMax" class="form-control input-sm">
                                         <option value="" selected>Consommation maximum</option>
-                                        <?= createOption('4', '4L/100km', $_POST['conso']) ?>
-                                        <?= createOption('5', '5L/100km', $_POST['conso']) ?>
-                                        <?= createOption('6', '6L/100km', $_POST['conso']) ?>
-                                        <?= createOption('7', '7L/100km', $_POST['conso']) ?>
-                                        <?= createOption('8', '8L/100km', $_POST['conso']) ?>
-                                        <?= createOption('9', '9L/100km', $_POST['conso']) ?>
-                                        <?= createOption('10', '10L/100km', $_POST['conso']) ?>
-                                        <?= createOption('12', '12L/100km', $_POST['conso']) ?>
-                                        <?= createOption('15', '15L/100km', $_POST['conso']) ?>
-                                        <?= createOption('17', '17L/100km', $_POST['conso']) ?>
+                                        <?= createOption('4', '4L/100km', $_POST['consumptionMax']) ?>
+                                        <?= createOption('5', '5L/100km', $_POST['consumptionMax']) ?>
+                                        <?= createOption('6', '6L/100km', $_POST['consumptionMax']) ?>
+                                        <?= createOption('7', '7L/100km', $_POST['consumptionMax']) ?>
+                                        <?= createOption('8', '8L/100km', $_POST['consumptionMax']) ?>
+                                        <?= createOption('9', '9L/100km', $_POST['consumptionMax']) ?>
+                                        <?= createOption('10', '10L/100km', $_POST['consumptionMax']) ?>
+                                        <?= createOption('12', '12L/100km', $_POST['consumptionMax']) ?>
+                                        <?= createOption('15', '15L/100km', $_POST['consumptionMax']) ?>
+                                        <?= createOption('17', '17L/100km', $_POST['consumptionMax']) ?>
                                     </select>
                                 </div>
                                 <div class="col-lg-4 padding-none-sm  padding-0-10-0-0">
-                                    <select id="premiere_main" name="premiere_main" class="form-control input-sm">
+                                    <select id="firstHand" name="firstHand" class="form-control input-sm">
                                         <option value="" selected>Première main</option>
-                                        <?= createOption('1', 'Oui', $_POST['premiere_main']) ?>
+                                        <?= createOption('1', 'true', $_POST['firstHand']) ?>
                                     </select>
                                 </div>
                                 <div class="col-lg-4 padding-none-sm  padding-0-0-0-10">
-                                    <select class="form-control input-sm" id="transmission" name="transmission">
+                                    <select class="form-control input-sm" id="gearbox" name="gearbox">
                                         <option value="" selected>Boite de vitesse</option>
-                                        <?= createOption('2', 'Manuel', $_POST['transmission']) ?>
-                                        <?= createOption('1', 'Automatique', $_POST['transmission']) ?>
+                                        <?= createOption('MANUAL', 'Manuel', $_POST['transmission']) ?>
+                                        <?= createOption('AUTO', 'Automatique', $_POST['transmission']) ?>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="form-group padding-none col-md-12">
                                 <div class="col-lg-6 padding-none-sm  padding-0-10-0-0">
-                                    <select id="pfisc1" name="pfisc1" class="form-control input-sm">
+                                    <select id="ratedHorsePowerMin" name="ratedHorsePowerMin" class="form-control input-sm">
                                         <option value="" selected>Puissance fiscal minimum</option>
-                                        <?= createOption('4', '4 CV', $_POST['pfisc1']) ?>
-                                        <?= createOption('5', '5 CV', $_POST['pfisc1']) ?>
-                                        <?= createOption('6', '6 CV', $_POST['pfisc1']) ?>
-                                        <?= createOption('7', '7 CV', $_POST['pfisc1']) ?>
-                                        <?= createOption('8', '8 CV', $_POST['pfisc1']) ?>
-                                        <?= createOption('9', '9 CV', $_POST['pfisc1']) ?>
-                                        <?= createOption('10', '10 CV', $_POST['pfisc1']) ?>
-                                        <?= createOption('12', '12 CV', $_POST['pfisc1']) ?>
-                                        <?= createOption('15', '15 CV', $_POST['pfisc1']) ?>
-                                        <?= createOption('20', '20 CV', $_POST['pfisc1']) ?>
+                                        <?= createOption('4', '4 CV', $_POST['ratedHorsePowerMin']) ?>
+                                        <?= createOption('5', '5 CV', $_POST['ratedHorsePowerMin']) ?>
+                                        <?= createOption('6', '6 CV', $_POST['ratedHorsePowerMin']) ?>
+                                        <?= createOption('7', '7 CV', $_POST['ratedHorsePowerMin']) ?>
+                                        <?= createOption('8', '8 CV', $_POST['ratedHorsePowerMin']) ?>
+                                        <?= createOption('9', '9 CV', $_POST['ratedHorsePowerMin']) ?>
+                                        <?= createOption('10', '10 CV', $_POST['ratedHorsePowerMin']) ?>
+                                        <?= createOption('12', '12 CV', $_POST['ratedHorsePowerMin']) ?>
+                                        <?= createOption('15', '15 CV', $_POST['ratedHorsePowerMin']) ?>
+                                        <?= createOption('20', '20 CV', $_POST['ratedHorsePowerMin']) ?>
                                     </select>
                                 </div>
                                 <div class="col-lg-6 padding-none-sm  padding-0-0-0-10">
-                                    <select id="pfisc2" name="pfisc2" class="form-control input-sm">
+                                    <select id="ratedHorsePowerMax" name="ratedHorsePowerMax" class="form-control input-sm">
                                         <option value="" selected>Puissance fiscal maximum</option>
-                                        <?= createOption('4', '4 CV', $_POST['pfisc2']) ?>
-                                        <?= createOption('5', '5 CV', $_POST['pfisc2']) ?>
-                                        <?= createOption('6', '6 CV', $_POST['pfisc2']) ?>
-                                        <?= createOption('7', '7 CV', $_POST['pfisc2']) ?>
-                                        <?= createOption('8', '8 CV', $_POST['pfisc2']) ?>
-                                        <?= createOption('9', '9 CV', $_POST['pfisc2']) ?>
-                                        <?= createOption('10', '10 CV', $_POST['pfisc2']) ?>
-                                        <?= createOption('12', '12 CV', $_POST['pfisc2']) ?>
-                                        <?= createOption('15', '15 CV', $_POST['pfisc2']) ?>
-                                        <?= createOption('20', '20 CV', $_POST['pfisc2']) ?>
+                                        <?= createOption('4', '4 CV', $_POST['ratedHorsePowerMax']) ?>
+                                        <?= createOption('5', '5 CV', $_POST['ratedHorsePowerMax']) ?>
+                                        <?= createOption('6', '6 CV', $_POST['ratedHorsePowerMax']) ?>
+                                        <?= createOption('7', '7 CV', $_POST['ratedHorsePowerMax']) ?>
+                                        <?= createOption('8', '8 CV', $_POST['ratedHorsePowerMax']) ?>
+                                        <?= createOption('9', '9 CV', $_POST['ratedHorsePowerMax']) ?>
+                                        <?= createOption('10', '10 CV', $_POST['ratedHorsePowerMax']) ?>
+                                        <?= createOption('12', '12 CV', $_POST['ratedHorsePowerMax']) ?>
+                                        <?= createOption('15', '15 CV', $_POST['ratedHorsePowerMax']) ?>
+                                        <?= createOption('20', '20 CV', $_POST['ratedHorsePowerMax']) ?>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="form-group padding-none col-md-12">
                                 <div class="col-lg-6 padding-none-sm  padding-0-10-0-0">
-                                    <select id="pdin1" name="pdin1" class="form-control input-sm">
+                                    <select id="powerDINMin" name="powerDINMin" class="form-control input-sm">
                                         <option value="" selected>Puissance din minimum</option>
-                                        <?= createOption('80', '80 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('90', '90 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('100', '100 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('110', '110 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('120', '120 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('130', '130 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('140', '140 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('150', '150 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('160', '160 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('170', '170 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('180', '180 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('190', '190 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('200', '200 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('220', '220 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('250', '250 ch', $_POST['pdin1']) ?>
-                                        <?= createOption('-1', '+ de 250 ch', $_POST['pdin1']) ?>
+                                        <?= createOption('80', '80 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('90', '90 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('100', '100 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('110', '110 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('120', '120 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('130', '130 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('140', '140 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('150', '150 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('160', '160 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('170', '170 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('180', '180 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('190', '190 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('200', '200 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('220', '220 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('250', '250 ch', $_POST['powerDINMin']) ?>
+                                        <?= createOption('-1', '+ de 250 ch', $_POST['powerDINMin']) ?>
                                     </select>
                                 </div>
                                 <div class="col-lg-6 padding-none-sm  padding-0-0-0-10">
-                                    <select id="pdin2" name="pdin2" class="form-control input-sm">
+                                    <select id="powerDINMax" name="powerDINMax" class="form-control input-sm">
                                         <option value="" selected>Puissance din maximum</option>
-                                        <?= createOption('80', '80 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('90', '90 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('100', '100 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('110', '110 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('120', '120 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('130', '130 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('140', '140 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('150', '150 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('160', '160 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('170', '170 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('180', '180 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('190', '190 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('200', '200 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('220', '220 ch', $_POST['pdin2']) ?>
-                                        <?= createOption('250', '250 ch', $_POST['pdin2']) ?>
+                                        <?= createOption('80', '80 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('90', '90 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('100', '100 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('110', '110 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('120', '120 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('130', '130 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('140', '140 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('150', '150 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('160', '160 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('170', '170 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('180', '180 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('190', '190 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('200', '200 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('220', '220 ch', $_POST['powerDINMax']) ?>
+                                        <?= createOption('250', '250 ch', $_POST['powerDINMax']) ?>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="form-group padding-none col-md-12">
-                                <select class="form-control input-sm" id="couleur" name="couleur">
+                                <select class="form-control input-sm" id="externalColors" name="externalColors">
                                     <option value="" selected>Couleur</option>
-                                    <?= createOption('Argent', 'Argent', $_POST['couleur']) ?>
-                                    <?= createOption('Beige', 'Beige', $_POST['couleur']) ?>
-                                    <?= createOption('Blanc', 'Blanc', $_POST['couleur']) ?>
-                                    <?= createOption('Bleu', 'Bleu', $_POST['couleur']) ?>
-                                    <?= createOption('Bordeaux', 'Bordeaux', $_POST['couleur']) ?>
-                                    <?= createOption('Gris', 'Gris', $_POST['couleur']) ?>
-                                    <?= createOption('Ivoire', 'Ivoire', $_POST['couleur']) ?>
-                                    <?= createOption('Jaune', 'Jaune', $_POST['couleur']) ?>
-                                    <?= createOption('Marron', 'Marron', $_POST['couleur']) ?>
-                                    <?= createOption('Noir', 'Noir', $_POST['couleur']) ?>
-                                    <?= createOption('Or', 'Or', $_POST['couleur']) ?>
-                                    <?= createOption('Orange', 'Orange', $_POST['couleur']) ?>
-                                    <?= createOption('Rose', 'Rose', $_POST['couleur']) ?>
-                                    <?= createOption('Rouge', 'Rouge', $_POST['couleur']) ?>
-                                    <?= createOption('Vert', 'Vert', $_POST['couleur']) ?>
-                                    <?= createOption('Violet', 'Violet', $_POST['couleur']) ?>
+                                    <?= createOption('Argent', 'Argent', $_POST['externalColors']) ?>
+                                    <?= createOption('Beige', 'Beige', $_POST['externalColors']) ?>
+                                    <?= createOption('Blanc', 'Blanc', $_POST['externalColors']) ?>
+                                    <?= createOption('Bleu', 'Bleu', $_POST['externalColors']) ?>
+                                    <?= createOption('Bordeaux', 'Bordeaux', $_POST['externalColors']) ?>
+                                    <?= createOption('Gris', 'Gris', $_POST['externalColors']) ?>
+                                    <?= createOption('Ivoire', 'Ivoire', $_POST['externalColors']) ?>
+                                    <?= createOption('Jaune', 'Jaune', $_POST['externalColors']) ?>
+                                    <?= createOption('Marron', 'Marron', $_POST['externalColors']) ?>
+                                    <?= createOption('Noir', 'Noir', $_POST['externalColors']) ?>
+                                    <?= createOption('Or', 'Or', $_POST['externalColors']) ?>
+                                    <?= createOption('Orange', 'Orange', $_POST['externalColors']) ?>
+                                    <?= createOption('Rose', 'Rose', $_POST['externalColors']) ?>
+                                    <?= createOption('Rouge', 'Rouge', $_POST['externalColors']) ?>
+                                    <?= createOption('Vert', 'Vert', $_POST['externalColors']) ?>
+                                    <?= createOption('Violet', 'Violet', $_POST['externalColors']) ?>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <select class="form-control input-sm" id="nbportes" name="nbportes">
+                                <select class="form-control input-sm" id="doors" name="doors">
                                     <option value="" selected>Nombre de porte</option>
-                                    <?= createOption('=2', '2', $_POST['nbportes']) ?>
-                                    <?= createOption('=3', '3', $_POST['nbportes']) ?>
-                                    <?= createOption('=4', '4', $_POST['nbportes']) ?>
-                                    <?= createOption('=5', '5', $_POST['nbportes']) ?>
-                                    <?= createOption('>=6', '6', $_POST['nbportes']) ?>
+                                    <?= createOption('=2', '2', $_POST['doors']) ?>
+                                    <?= createOption('=3', '3', $_POST['doors']) ?>
+                                    <?= createOption('=4', '4', $_POST['doors']) ?>
+                                    <?= createOption('=5', '5', $_POST['doors']) ?>
+                                    <?= createOption('>=6', '6', $_POST['doors']) ?>
                                 </select>
                             </div>
 
@@ -502,8 +499,9 @@ function createOption($value, $name, $defaultValue) {
         </div>
 
         <?php
-        if (empty($_POST['SS_CATEGORIE']))
-            unset($_POST['SS_CATEGORIE']);
+        if (empty($_POST['categories'])) {
+            unset($_POST['categories']);
+        }
 
         if (isset($aResult) && !empty($aResult)) {
             ?>
@@ -543,10 +541,13 @@ function createOption($value, $name, $defaultValue) {
                                             <ul class="list-group">
                                                 <?php
                                                 foreach ($aInfo as $sModel => $sNumber) {
+                                                    $uriParams = $aParams;
+                                                    $uriParams['makesModelsCommercialNames'] .= ":$sModel";
+                                                    $sModel = explode(':', $sModel)[1];
                                                     ?>
                                                     <li class="list-group-item">
                                                         <span class="badge"><?= $sNumber ?></span>
-                                                        <a href="<?= getDomain() . getUri($aParams) ?>&marque=<?= $sBrand ?>&mo_comm=<?= $sModel ?>" target="_blank" rel="noreferrer"><?= $sModel ?></a>
+                                                        <a href="<?= getDomain() . getUri($uriParams) ?>" target="_blank" rel="noreferrer"><?= $sModel ?></a>
                                                     </li>
                                                     <?php
                                                 }

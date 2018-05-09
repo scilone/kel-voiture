@@ -6,23 +6,23 @@
 class Mycurl
 {
 
-    protected $useragent          = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1';
-    protected $_url;
-    protected $_followlocation;
-    protected $_timeout;
-    protected $_maxRedirects;
-    protected $_cookieFileLocation = './cookie/cookie.txt';
-    protected $_post;
-    protected $_postFields;
-    protected $_referer            = "http://www.google.com";
-    protected $_session;
-    protected $_webpage;
-    protected $_includeHeader;
-    protected $_noBody;
-    protected $_status;
-    protected $_binaryTransfer;
-    protected $domain;
-    protected $ch;
+    public $useragent          = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1';
+    public $_url;
+    public $_followlocation;
+    public $_timeout;
+    public $_maxRedirects;
+    public $_cookieFileLocation = './cookie/cookie.txt';
+    public $_post;
+    public $_postFields;
+    public $_referer            = "http://www.google.com";
+    public $_session;
+    public $_webpage;
+    public $_includeHeader;
+    public $_noBody;
+    public $_status;
+    public $_binaryTransfer;
+    public $domain;
+    public $ch;
     public $authentication = 0;
     public $auth_name = '';
     public $auth_pass = '';
@@ -84,7 +84,7 @@ class Mycurl
 
         $this->_cookieFileLocation = dirname(__FILE__) . '/cookie/cookie' . session_id() . '.txt';
 
-        $this->domain = 'http://www.lacentrale.fr/';
+        $this->domain = 'https://www.lacentrale.fr/';
     }
 
     /**
@@ -126,7 +126,6 @@ class Mycurl
     public function createCurl($url)
     {
         $this->_url = $this->domain . $url;
-
         if (!isset($this->ch) || get_resource_type($this->ch) !== 'curl') {
             $this->ch = curl_init();
 
